@@ -1,0 +1,65 @@
+﻿@using PruebaDetalleMaestro.Models
+@using PruebaDetalleMaestro.Services
+@inject OrderService orderService
+@inject NavigationManager navigationManager
+
+@page "/modificar/{id:int}"
+
+<h3 class="text-center">Modificar Orden</h3>
+
+<div class="container mt-4">
+    @if (order == null)
+    {
+        <p><em>Cargando orden...</em></p>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-12">
+                <form>
+                    <div class="form-group">
+                        <label for="customerName">Nombre del Cliente</label>
+                        <input type="text" class="form-control" id="customerName" @bind="order.CustomerName" placeholder="Ingresa el nombre del cliente" required />
+                    </div>
+
+                    <div class="form-group mt-4">
+                        <label for="orderDate">Fecha de la Orden</label>
+                        <input type="date" class="form-control" id="orderDate" @bind="order.OrderDate" required />
+                    </div>
+
+                    <div class="form-group mt-4">
+                        <label for="orderDetails">Detalles</label>
+                        <textarea class="form-control" id="orderDetails" rows="5" @bind="order.OrderDetails"></textarea>
+                    </div>
+
+                    <button type="button" class="btn btn-primary mt-3" @onclick="GuardarOrden">Guardar Cambios</button>
+                    <button type="button" class="btn btn-secondary mt-3 ml-2" @onclick="Cancelar">Cancelar</button>
+                </form>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public int id { get; set; }
+    private Order? order;
+
+    protected override async Task OnInitializedAsync()
+    {
+        order = await orderService.ObtenerOrdenPorId(id);
+    }
+
+    private async Task GuardarOrden()
+    {
+        if (!string.IsNullOrEmpty(order.CustomerName) && !string.IsNullOrEmpty(order.OrderDetails))
+        {
+            await orderService.ModificarOrden(order);
+            navigationManager.NavigateTo("/");
+        }
+    }
+
+    private void Cancelar()
+    {
+        navigationManager.NavigateTo("/");
+    }
+}

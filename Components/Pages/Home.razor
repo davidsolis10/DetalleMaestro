@@ -1,0 +1,61 @@
+﻿@using PruebaDetalleMaestro.Models
+@using PruebaDetalleMaestro.Services
+
+@page "/"
+
+<PageTitle>Crear</PageTitle>
+
+@inject OrderService orderService
+@inject NavigationManager navigationManager
+
+<h3 class="text-center">Consulta de Órdenes</h3>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Nombre del Cliente</th>
+                    <th>Fecha de la Orden</th>
+                    <th>Detalles</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var order in orders)
+                {
+                <tr>
+                    <td>@order.CustomerName</td>
+                    <td>@order.OrderDate.ToShortDateString()</td>
+                    <td>@order.OrderDetails</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" @onclick="() => ModificarOrden(order.OrderID)">Modificar</button>
+                        <button class="btn btn-danger btn-sm ml-2" @onclick="() => EliminarOrden(order.OrderID)">Eliminar</button>
+                    </td>
+                </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<Order> orders = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        orders = await orderService.GetOrders();
+    }
+    
+    private void ModificarOrden(int id)
+    {
+        navigationManager.NavigateTo($"/modificar/{id}");
+    }
+
+    private void EliminarOrden(int id)
+    {
+        navigationManager.NavigateTo($"/eliminar/{id}");
+    }
+}

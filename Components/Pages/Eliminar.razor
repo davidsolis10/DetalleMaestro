@@ -1,0 +1,52 @@
+﻿@using PruebaDetalleMaestro.Models
+@using PruebaDetalleMaestro.Services
+@inject OrderService orderService
+@inject NavigationManager navigationManager
+
+@page "/eliminar/{id:int}"
+
+<h3 class="text-center">Eliminar Orden</h3>
+
+<div class="container mt-4">
+    @if (order == null)
+    {
+        <p><em>Cargando orden...</em></p>
+    }
+    else
+    {
+        <div class="alert alert-danger">
+            <h4 class="alert-heading">¿Estás seguro que deseas eliminar esta orden?</h4>
+            <p><strong>Nombre del Cliente:</strong> @order.CustomerName</p>
+            <p><strong>Fecha de la Orden:</strong> @order.OrderDate.ToShortDateString()</p>
+            <p><strong>Detalles de la Orden:</strong></p>
+            <pre>@order.OrderDetails</pre>
+            <hr />
+            <button class="btn btn-danger" @onclick="EliminarOrden">Eliminar</button>
+            <button class="btn btn-secondary ml-2" @onclick="Cancelar">Cancelar</button>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public int id { get; set; }
+    private Order order;
+
+    protected override async Task OnInitializedAsync()
+    {
+        order = await orderService.ObtenerOrdenPorId(id);
+    }
+
+    private async Task EliminarOrden()
+    {
+        if (order != null)
+        {
+            await orderService.EliminarOrden(id);
+            navigationManager.NavigateTo("/");
+        }
+    }
+
+    private void Cancelar()
+    {
+        navigationManager.NavigateTo("/");
+    }
+}
